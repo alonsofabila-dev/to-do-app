@@ -83,7 +83,7 @@ public class Task {
         return "{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
-                ", dueDate='" + (dueDate != null ? dueDate : "") + '\'' +
+                ", dueDate='" + (dueDate != null ? dueDate : null) + '\'' +
                 ", completed='" + isCompleted + '\'' +
                 ", priority='" + priority + '\'' +
                 ", creationDate='" + creationDate + '\'' +
