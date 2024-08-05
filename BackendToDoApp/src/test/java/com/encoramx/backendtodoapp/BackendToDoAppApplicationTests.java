@@ -19,7 +19,7 @@ class BackendToDoAppApplicationTests {
 		task.setCompleted(false);
 		task.setDueDate(LocalDateTime.of(2024, 8, 5, 8, 41, 59));
 
-		assertThat(task.getId()).isEqualTo(1);
+		assertThat(task.getId()).isGreaterThan(0);
 		assertThat(task.getContent()).isEqualTo("Hello World");
 		assertThat(task.getPriority()).isEqualTo(Task.Priority.HIGH);
 		assertThat(task.isCompleted()).isEqualTo(false);
@@ -35,7 +35,7 @@ class BackendToDoAppApplicationTests {
 		task.setPriority(Task.Priority.HIGH);
 		task.setCompleted(false);
 
-		assertThat(task.getId()).isEqualTo(1);
+		assertThat(task.getId()).isGreaterThan(0);
 		assertThat(task.getContent()).isEqualTo("Hello World");
 		assertThat(task.getPriority()).isEqualTo(Task.Priority.HIGH);
 		assertThat(task.isCompleted()).isEqualTo(false);

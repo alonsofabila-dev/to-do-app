@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 
 public class Task {
 
-    private int id = 0;
+    private static int counter = 1;
+
+    private final int id;
     private String content;
     private LocalDateTime dueDate;
     private boolean isCompleted;
@@ -14,7 +16,7 @@ public class Task {
 
 
     public Task() {
-        this.id += 1;
+        this.id = counter++;
         this.creationDate = LocalDateTime.now();
     }
 
