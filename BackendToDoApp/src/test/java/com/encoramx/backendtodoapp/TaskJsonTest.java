@@ -112,7 +112,6 @@ public class TaskJsonTest {
         """;
 
         LinkedList<Task> tasks = jsonList.parseObject(expected);
-        System.out.println(tasks);
 
         assertThat(tasks.getFirst().getContent()).isEqualTo("task 1");
         assertThat(tasks.get(1).getContent()).isEqualTo("task 2");
