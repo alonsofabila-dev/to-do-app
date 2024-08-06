@@ -7,7 +7,8 @@ import java.util.LinkedList;
 
 
 public interface IDAOTask {
-    LinkedList<Task> findAll();
+    LinkedList<Task> findTasks(int page);
+    Task findById(int id);
     void createTask(Task task);
     Task updateTask(Task task);
 }

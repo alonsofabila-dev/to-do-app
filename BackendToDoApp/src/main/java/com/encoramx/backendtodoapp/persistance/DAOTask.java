@@ -6,6 +6,7 @@ import com.encoramx.backendtodoapp.entities.Task;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -13,14 +14,27 @@ public class DAOTask implements IDAOTask {
 
     private final LinkedList<Task> tasksList = new LinkedList<>();
 
+
+    /**
+     * @return (List) List of task with length of 10.
+     */
     @Override
-    public LinkedList<Task> findAll() {
+    public LinkedList<Task> findTasks(int page) {
+        return tasksList.stream()
+                .skip((long) page * 10)
+                .limit(10)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+
+    @Override
+    public Task findById(int id) {
         return null;
     }
 
 
     /**
-     * @param newTask (Object, required): Task to be inserted in the List
+     * @param newTask (Object, required): Task to be inserted in the List.
      */
     @Override
     public void createTask(Task newTask) {
