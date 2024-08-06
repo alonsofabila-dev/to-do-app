@@ -39,7 +39,26 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.OK).body(tasks);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LinkedList<>());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    /**
+     * @param requestedId (int, Required): The ID of the task to be requested.
+     * @return Response with status code 200 and the task requested.
+     */
+    @GetMapping("/{requestedId}")
+    public ResponseEntity<Task> getTask(@PathVariable int requestedId) {
+        try {
+            Task task = taskService.getTaskById(requestedId);
+            if (task != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(task);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

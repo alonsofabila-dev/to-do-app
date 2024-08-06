@@ -22,6 +22,10 @@ public class TaskService {
         return daoTask.findTasks(page);
     }
 
+    public Task getTaskById(int id) {
+        return daoTask.findById(id);
+    }
+
     public void createTask(Task task) {
         daoTask.createTask(task);
     }

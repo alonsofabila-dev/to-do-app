@@ -27,9 +27,16 @@ public class DAOTask implements IDAOTask {
     }
 
 
+    /**
+     * @param id (int, Required) ID to search in the list.
+     * @return (Object) The task with the specified ID.
+     */
     @Override
     public Task findById(int id) {
-        return null;
+        return tasksList.stream()
+                .filter(task -> task.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
 
