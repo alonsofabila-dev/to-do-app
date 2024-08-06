@@ -21,11 +21,19 @@ public class TaskController {
 
     /**
      * @param task (Object, Required) Task to be created
-     * @return status code 201 if created, otherwise status code 209 existing pk conflict.
+     * @return ResponseEntity with status code 201 if the task is created successfully,
+     * status code 400 if the task is null or missing priority
+     * or status code 409 if there's a conflict.
      */
     @PostMapping
     public ResponseEntity<String> createTask(@RequestBody Task task) {
         try {
+            if (task == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task cannot be null");
+            }
+            if (task.getPriority() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing priority");
+            }
             taskService.createTask(task);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header("Location", "/tasks/" + task.getId())

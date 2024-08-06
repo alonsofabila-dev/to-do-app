@@ -44,9 +44,6 @@ public class Task {
     }
 
     public void setContent(String content) {
-        if (content.length() > 120) {
-            throw new IllegalArgumentException("Content exceeds maximum 120 characters");
-        }
         this.content = content;
     }
 

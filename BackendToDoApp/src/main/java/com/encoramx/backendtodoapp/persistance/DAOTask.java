@@ -24,11 +24,15 @@ public class DAOTask implements IDAOTask {
      */
     @Override
     public void createTask(Task newTask) {
+        if (newTask.getContent().length() > 120) {
+            throw new IllegalArgumentException("Content exceeds maximum 120 characters");
+        }
         // Check for existing Id before insertion of newTask.
         if (tasksList.stream().anyMatch(task -> task.getId() == newTask.getId())) {
             throw new IllegalArgumentException("Task already exists");
         }
         tasksList.add(newTask);
+        System.out.println(tasksList);
     }
 
     @Override
