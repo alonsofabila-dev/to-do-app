@@ -32,7 +32,6 @@ public class DAOTask implements IDAOTask {
             throw new IllegalArgumentException("Task already exists");
         }
         tasksList.add(newTask);
-        System.out.println(tasksList);
     }
 
     @Override
