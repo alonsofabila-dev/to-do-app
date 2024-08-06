@@ -34,13 +34,16 @@ public class TaskController {
     public ResponseEntity<LinkedList<Task>> getAllTasks(
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
+
         try {
             LinkedList<Task> tasks = taskService.getTasks(page);
+
             return ResponseEntity.status(HttpStatus.OK).body(tasks);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
     }
 
 
@@ -50,16 +53,20 @@ public class TaskController {
      */
     @GetMapping("/{requestedId}")
     public ResponseEntity<Task> getTask(@PathVariable int requestedId) {
+
         try {
             Task task = taskService.getTaskById(requestedId);
+
             if (task != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(task);
             }
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
     }
 
 
@@ -71,12 +78,15 @@ public class TaskController {
      */
     @PostMapping
     public ResponseEntity<String> createTask(@RequestBody Task task) {
+
         try {
             if (task == null || task.getPriority() == null) {
                 logger.debug("Task is null or task priority is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
             }
+
             taskService.createTask(task);
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .header("Location", "/tasks/" + task.getId())
                     .body("Task created successfully");
@@ -84,5 +94,6 @@ public class TaskController {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Invalid request");
         }
+
     }
 }
