@@ -20,6 +20,7 @@ public class DAOTask implements IDAOTask {
      */
     @Override
     public LinkedList<Task> findTasks(int page) {
+        // Send a copy of the list limited to 10  depending on the page.
         return tasksList.stream()
                 .skip((long) page * 10)
                 .limit(10)
@@ -33,6 +34,7 @@ public class DAOTask implements IDAOTask {
      */
     @Override
     public Task findById(int id) {
+        // Search for task with existing id.
         return tasksList.stream()
                 .filter(task -> task.getId() == id)
                 .findFirst()
