@@ -29,4 +29,8 @@ public class TaskService {
     public void createTask(Task task) {
         daoTask.createTask(task);
     }
+
+    public void updateTask(int id, Task updatedTask) {
+        daoTask.updateTask(id, updatedTask);
+    }
 }

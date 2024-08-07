@@ -27,7 +27,7 @@ public class TaskController {
 
 
     /**
-     * @param page (int, optional): The page number to retrieve.
+     * @param page (int, optional) The page number to retrieve.
      * @return Response with status code 200 and a list of task with length of 10.
      */
     @GetMapping
@@ -36,6 +36,11 @@ public class TaskController {
     ) {
 
         try {
+            if (page < 0) {
+                logger.warn("Invalid page number");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
             LinkedList<Task> tasks = taskService.getTasks(page);
 
             return ResponseEntity.status(HttpStatus.OK).body(tasks);
@@ -55,6 +60,11 @@ public class TaskController {
     public ResponseEntity<Task> getTask(@PathVariable int requestedId) {
 
         try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
             Task task = taskService.getTaskById(requestedId);
 
             if (task != null) {
@@ -81,7 +91,7 @@ public class TaskController {
 
         try {
             if (task == null || task.getPriority() == null) {
-                logger.debug("Task is null or task priority is null");
+                logger.warn("Task is null or task priority is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
             }
 
@@ -93,6 +103,36 @@ public class TaskController {
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Invalid request");
+        }
+
+    }
+
+
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @param updatedTask (Object, Required) new details of the task.
+     * @return Response with status code 200.
+     */
+    @PutMapping("/{requestedId}")
+    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Task updatedTask) {
+
+        try {
+            if (updatedTask == null) {
+                logger.warn("Task is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            taskService.updateTask(requestedId, updatedTask);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
+        } catch (Exception e) {
+            logger.error("Error updating task: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
 
     }

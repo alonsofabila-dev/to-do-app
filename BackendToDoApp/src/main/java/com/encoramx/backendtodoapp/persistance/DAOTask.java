@@ -35,15 +35,12 @@ public class DAOTask implements IDAOTask {
     @Override
     public Task findById(int id) {
         // Search for task with existing id.
-        return tasksList.stream()
-                .filter(task -> task.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return getTask(id);
     }
 
 
     /**
-     * @param newTask (Object, required): Task to be inserted in the List.
+     * @param newTask (Object, required) Task to be inserted in the List.
      */
     @Override
     public void createTask(Task newTask) {
@@ -57,8 +54,23 @@ public class DAOTask implements IDAOTask {
         tasksList.add(newTask);
     }
 
+
+    /**
+     * @param id (int, Required) ID of the task to be updated.
+     * @param updatedTask (Object, Required) new details of the task.
+     */
     @Override
-    public Task updateTask(Task task) {
-        return null;
+    public void updateTask(int id, Task updatedTask) {
+        Task task = getTask(id);
+        task.setContent(updatedTask.getContent());
+        task.setDueDate(updatedTask.getDueDate());
+        task.setPriority(updatedTask.getPriority());
+    }
+
+    public Task getTask(int id) {
+        return tasksList.stream()
+                .filter(t -> t.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 }
