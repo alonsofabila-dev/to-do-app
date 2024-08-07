@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -113,6 +115,90 @@ class BackendToDoAppApplicationTests {
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		assertThat(getResponse.getBody()).isBlank();
+	}
+
+	@Test
+	void shouldUpdateASavedTask() {
+		Task newTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false
+		);
+
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+
+		Task updatedTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false,
+				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+		);
+
+		HttpEntity<Task> request = new HttpEntity<>(updatedTask);
+		ResponseEntity<Void> response = restTemplate.exchange("/tasks/" + id, HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+
+	@Test
+	void shouldNotUpdateTaskWithInvalidId() {
+		Task newTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false
+		);
+
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+
+		Task uodatedTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false,
+				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+		);
+
+		HttpEntity<Task> request = new HttpEntity<>(uodatedTask);
+		ResponseEntity<Void> response = restTemplate.exchange("/tasks/-" + id, HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+
+	@Test
+	void shouldNotUpdateAnEmptyTask() {
+		Task newTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false
+		);
+
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+
+		Task updatedTask = new Task();
+
+		HttpEntity<Task> request = new HttpEntity<>(updatedTask);
+		ResponseEntity<Void> response = restTemplate.exchange("/tasks/" + id, HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 	}
 
 }

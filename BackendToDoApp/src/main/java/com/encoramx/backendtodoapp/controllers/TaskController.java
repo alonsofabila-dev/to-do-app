@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 
 @RestController
@@ -27,7 +28,7 @@ public class TaskController {
 
 
     /**
-     * @param page (int, optional): The page number to retrieve.
+     * @param page (int, optional) The page number to retrieve.
      * @return Response with status code 200 and a list of task with length of 10.
      */
     @GetMapping
@@ -36,6 +37,11 @@ public class TaskController {
     ) {
 
         try {
+            if (page < 0) {
+                logger.warn("Invalid page number");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
             LinkedList<Task> tasks = taskService.getTasks(page);
 
             return ResponseEntity.status(HttpStatus.OK).body(tasks);
@@ -55,6 +61,11 @@ public class TaskController {
     public ResponseEntity<Task> getTask(@PathVariable int requestedId) {
 
         try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
             Task task = taskService.getTaskById(requestedId);
 
             if (task != null) {
@@ -81,7 +92,7 @@ public class TaskController {
 
         try {
             if (task == null || task.getPriority() == null) {
-                logger.debug("Task is null or task priority is null");
+                logger.warn("Task is null or task priority is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
             }
 
@@ -93,6 +104,65 @@ public class TaskController {
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Invalid request");
+        }
+
+    }
+
+
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @param updatedTask (Map, Required) new details of the task.
+     * @return Response with status code 200.
+     */
+    @PutMapping("/{requestedId}")
+    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Map<String, Object> updatedTask) {
+
+        try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            String content = (String) updatedTask.get("content");
+            String dueDate = (String) updatedTask.get("dueDate");
+            String priority = (String) updatedTask.get("priority");
+
+            if (content == null || priority == null) {
+                logger.warn("Task is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            taskService.updateTask(requestedId, content, dueDate, priority);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
+        } catch (Exception e) {
+            logger.error("Error updating task: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
+        }
+
+    }
+
+
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @param isCompleted (Map, Required) new status of the task.
+     * @return Response with status code 200.
+     */
+    @PatchMapping("/{requestedId}")
+    public ResponseEntity<String> updateTaskCompletion(@PathVariable int requestedId, @RequestBody Map<String, Boolean> isCompleted) {
+        try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            boolean completed = isCompleted.get("isCompleted");
+            taskService.updateCompletedTask(requestedId, completed);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
 
     }
