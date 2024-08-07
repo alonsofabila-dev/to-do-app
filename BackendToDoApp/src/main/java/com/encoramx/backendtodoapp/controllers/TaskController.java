@@ -117,7 +117,7 @@ public class TaskController {
     public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Task updatedTask) {
 
         try {
-            if (updatedTask == null) {
+            if (updatedTask.getContent() == null || updatedTask.getPriority() == null) {
                 logger.warn("Task is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
