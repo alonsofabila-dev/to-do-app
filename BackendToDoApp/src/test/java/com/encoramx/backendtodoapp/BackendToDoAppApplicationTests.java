@@ -3,9 +3,9 @@ package com.encoramx.backendtodoapp;
 
 import com.encoramx.backendtodoapp.entities.Task;
 
-// import com.jayway.jsonpath.DocumentContext;
-// import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.DocumentContext;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
-// import java.net.URI;
+import java.net.URI;
 
 import java.time.LocalDateTime;
-
-// import net.minidev.json.JSONArray;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,21 +42,18 @@ class BackendToDoAppApplicationTests {
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
 
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-	}
 
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
 
-	@Test
-	@DirtiesContext
-	void shouldCreateNewTaskObjectWithoutDueDate() {
-		Task newTask = new Task(
-				"Lorem ipsum dolor sit amet",
-				Task.Priority.HIGH,
-				false
-		);
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
 
-		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+
+		Number id = documentContext.read("$.id");
+
+		assertThat(id).isNotNull();
 	}
 
 
@@ -83,4 +78,41 @@ class BackendToDoAppApplicationTests {
 
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 	}
+
+
+	@Test
+	@DirtiesContext
+	void shouldReturnASavedTask() {
+		Task newTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false
+		);
+
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
+
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+
+		Number id = documentContext.read("$.id");
+
+		assertThat(id).isNotNull();
+	}
+
+
+	@Test
+	void shouldNotReturnATaskWithUnknownId() {
+		ResponseEntity<String> getResponse = restTemplate.getForEntity("/tasks/1", String.class);
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(getResponse.getBody()).isBlank();
+	}
+
 }
