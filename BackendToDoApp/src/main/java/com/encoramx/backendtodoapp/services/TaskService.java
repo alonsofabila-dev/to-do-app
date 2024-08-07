@@ -30,7 +30,11 @@ public class TaskService {
         daoTask.createTask(task);
     }
 
-    public void updateTask(int id, Task updatedTask) {
-        daoTask.updateTask(id, updatedTask);
+    public void updateTask(int id, String content, String dueDate, String priority) {
+        daoTask.updateTask(id, content, dueDate, priority);
+    }
+
+    public void updateCompletedTask(int id, boolean isCompleted) {
+        daoTask.updateCompleted(id, isCompleted);
     }
 }

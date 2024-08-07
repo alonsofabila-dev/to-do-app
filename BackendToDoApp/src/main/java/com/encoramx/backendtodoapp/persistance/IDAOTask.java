@@ -10,5 +10,6 @@ public interface IDAOTask {
     LinkedList<Task> findTasks(int page);
     Task findById(int id);
     void createTask(Task task);
-    void updateTask(int id, Task updatedTask);
+    void updateTask(int id, String content, String dueDate, String priority);
+    void updateCompleted(int id, boolean isCompleted);
 }

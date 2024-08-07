@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 
 @RestController
@@ -110,28 +111,57 @@ public class TaskController {
 
     /**
      * @param requestedId (int, Required) the ID of the task to be updated.
-     * @param updatedTask (Object, Required) new details of the task.
+     * @param updatedTask (Map, Required) new details of the task.
      * @return Response with status code 200.
      */
     @PutMapping("/{requestedId}")
-    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Task updatedTask) {
+    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Map<String, Object> updatedTask) {
 
         try {
-            if (updatedTask.getContent() == null || updatedTask.getPriority() == null) {
-                logger.warn("Task is null");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-
             if (requestedId <= 0) {
                 logger.warn("Invalid Id");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            taskService.updateTask(requestedId, updatedTask);
+            String content = (String) updatedTask.get("content");
+            String dueDate = (String) updatedTask.get("dueDate");
+            String priority = (String) updatedTask.get("priority");
+
+            if (content == null || priority == null) {
+                logger.warn("Task is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            taskService.updateTask(requestedId, content, dueDate, priority);
 
             return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
         } catch (Exception e) {
             logger.error("Error updating task: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
+        }
+
+    }
+
+
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @param isCompleted (Map, Required) new status of the task.
+     * @return Response with status code 200.
+     */
+    @PatchMapping("/{requestedId}")
+    public ResponseEntity<String> updateTaskCompletion(@PathVariable int requestedId, @RequestBody Map<String, Boolean> isCompleted) {
+        try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            boolean completed = isCompleted.get("isCompleted");
+            taskService.updateCompletedTask(requestedId, completed);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
 

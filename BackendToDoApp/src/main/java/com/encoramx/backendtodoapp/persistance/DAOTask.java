@@ -5,6 +5,7 @@ import com.encoramx.backendtodoapp.entities.Task;
 
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -57,15 +58,32 @@ public class DAOTask implements IDAOTask {
 
     /**
      * @param id (int, Required) ID of the task to be updated.
-     * @param updatedTask (Object, Required) new details of the task.
+     * @param content (String, Required) new content change.
+     * @param dueDate (String, Optional) new dueDate to change or keep the same one.
+     * @param priority (String, Required) new priority for the task.
      */
     @Override
-    public void updateTask(int id, Task updatedTask) {
+    public void updateTask(int id, String content, String dueDate, String priority) {
         Task task = getTask(id);
-        task.setContent(updatedTask.getContent());
-        task.setDueDate(updatedTask.getDueDate());
-        task.setPriority(updatedTask.getPriority());
+        task.setContent(content);
+        task.setPriority(Task.Priority.valueOf(priority));
+        if (!dueDate.isEmpty()) {
+            task.setDueDate(LocalDateTime.parse(dueDate));
+        }
+        task.setDueDate(null);
     }
+
+
+    /**
+     * @param id (int, Required) ID of the task to be updated.
+     * @param isCompleted (boolean, Required) status to be changed on the task.
+     */
+    @Override
+    public void updateCompleted(int id, boolean isCompleted) {
+        Task task = getTask(id);
+        task.setCompleted(isCompleted);
+    }
+
 
     public Task getTask(int id) {
         return tasksList.stream()
