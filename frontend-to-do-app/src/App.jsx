@@ -1,8 +1,13 @@
+import { ToDosPage } from "./pages/ToDosPage.jsx";
+import { Toaster } from "react-hot-toast";
+
+
 function App() {
 
   return (
       <>
-          <div>Hello world</div>
+          <ToDosPage />
+          <Toaster />
       </>
   )
 }
