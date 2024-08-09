@@ -17,8 +17,6 @@ export function TaskList() {
         api.get(`/tasks?page=${number}`).then(response => {
 
             setTasks(response.data);
-            console.log(response.data);
-            setNumber(0);
 
         }).catch(error => {
             toast.error(error.message, TOAST_SUCCESS_STYLE);
@@ -28,7 +26,7 @@ export function TaskList() {
     const handleCheckboxChange = (taskId, completed) => {
         api.patch(`/tasks/${taskId}`, { isCompleted: completed }).then(response => {
             getTasks();
-            toast.success(response.data, TOAST_SUCCESS_STYLE);
+            console.log(response.data);
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
         });

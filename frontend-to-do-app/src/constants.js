@@ -13,3 +13,18 @@ export const TOAST_ERROR_STYLE = {
         color: "white"
     }
 }
+
+export const PRIORITY_OPTIONS = [
+    {
+        value: 1,
+        label: "LOW",
+    },
+    {
+        value: 2,
+        label: "MEDIUM",
+    },
+    {
+        value: 3,
+        label: "HIGH",
+    },
+]
