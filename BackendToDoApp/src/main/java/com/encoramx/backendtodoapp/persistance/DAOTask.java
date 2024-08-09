@@ -6,6 +6,7 @@ import com.encoramx.backendtodoapp.entities.Task;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -81,7 +82,12 @@ public class DAOTask implements IDAOTask {
     @Override
     public void updateCompleted(int id, boolean isCompleted) {
         Task task = getTask(id);
-        task.setCompleted(isCompleted);
+        if (isCompleted) {
+            task.setDoneDate(LocalDateTime.now());
+        } else {
+            task.setDoneDate(task.getCreationDate());
+            task.setCompleted(isCompleted);
+        }
     }
 
 

@@ -145,7 +145,7 @@ public class TaskController {
 
     /**
      * @param requestedId (int, Required) the ID of the task to be updated.
-     * @param isCompleted (Map, Required) new status of the task.
+     * @param isCompleted (Map, Required)  new details of the task.
      * @return Response with status code 200.
      */
     @PatchMapping("/{requestedId}")
