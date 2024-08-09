@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Modal, Pagination } from 'antd';
 import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../constants.js";
 import { useEffect, useState } from "react";
 import { TaskList } from "../components/TaskList.jsx";
@@ -14,21 +14,24 @@ export function ToDosPage() {
     const [priority, setPriority] = useState("LOW");
 
     const [tasks, setTasks] = useState([])
-    const [number, setNumber] = useState(0)
+    const [number, setNumber] = useState(1)
+    const [totalTasks, setTotalTasks] = useState()
 
     useEffect(() => {
         getTasks();
     }, [number]);
 
     const getTasks = () => {
-        getToDos(number).then(response => {
-            setTasks(response.data);
+        getToDos(number - 1).then(response => {
+            setTasks(response.data.tasks);
+            setTotalTasks(response.data.totalSize);
         }).catch(error => {
             toast.error(error.message);
         })
     }
 
     const handleCheckboxChange = (taskId, completed) => {
+        console.log(taskId, completed);
         updateComplete(taskId, completed).then(response => {
             setTasks(prevTasks =>
                 prevTasks.map(task =>
@@ -51,9 +54,11 @@ export function ToDosPage() {
             setTimeout(() => {
                 setOpen(false);
                 setConfirmLoading(false);
-                console.log(response);
+                setContent("");
+                setDueDate("");
+                setPriority("LOW");
                 toast.success(response.data, TOAST_SUCCESS_STYLE);
-            }, 1000);
+            }, 250);
             if (response.status === 201) {
                 getTasks()
             }
@@ -138,7 +143,19 @@ export function ToDosPage() {
                 </Modal>
             </div>
 
-            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} />
+            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange}/>
+
+            <div className="mt-4 flex justify-center">
+                <div className="bg-white rounded-lg shadow-md p-4">
+                    <Pagination
+                        align="center"
+                        current={number}
+                        total={totalTasks}
+                        pageSize={10}
+                        onChange={(page) => setNumber(page)}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
