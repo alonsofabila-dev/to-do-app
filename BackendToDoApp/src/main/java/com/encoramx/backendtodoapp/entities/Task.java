@@ -14,11 +14,13 @@ public class Task {
     private boolean isCompleted;
     private Priority priority;
     private final LocalDateTime creationDate;
+    private LocalDateTime doneDate;
 
 
     public Task() {
         this.id = counter++;
         this.creationDate = LocalDateTime.now();
+        this.doneDate = LocalDateTime.now();
     }
 
     public Task(String content, Priority priority, boolean isCompleted, LocalDate dueDate) {
@@ -56,6 +58,11 @@ public class Task {
         this.dueDate = dueDate;
     }
 
+    public void setDoneDate(LocalDateTime doneDate) {
+        this.doneDate = doneDate;
+    }
+
+
     public boolean isCompleted() {
         return isCompleted;
     }
@@ -85,6 +92,7 @@ public class Task {
                 ", completed='" + isCompleted + '\'' +
                 ", priority='" + priority + '\'' +
                 ", creationDate='" + creationDate + '\'' +
+                ", doneDate='" + (doneDate != null ? doneDate : null) + '\'' +
                 '}';
     }
 
