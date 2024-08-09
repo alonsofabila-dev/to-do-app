@@ -2,6 +2,7 @@ package com.encoramx.backendtodoapp.persistance;
 
 
 import com.encoramx.backendtodoapp.entities.Task;
+import com.encoramx.backendtodoapp.entities.TaskPair;
 
 import org.springframework.stereotype.Repository;
 
@@ -21,12 +22,14 @@ public class DAOTask implements IDAOTask {
      * @return (List) List of task with length of 10.
      */
     @Override
-    public LinkedList<Task> findTasks(int page) {
+    public TaskPair<LinkedList<Task>, Integer> findTasks(int page) {
         // Send a copy of the list limited to 10  depending on the page.
-        return tasksList.stream()
+        LinkedList<Task> sublist = tasksList.stream()
                 .skip((long) page * 10)
                 .limit(10)
                 .collect(Collectors.toCollection(LinkedList::new));
+
+        return new TaskPair<>(new LinkedList<>(sublist), tasksList.size());
     }
 
 
@@ -84,6 +87,7 @@ public class DAOTask implements IDAOTask {
         Task task = getTask(id);
         if (isCompleted) {
             task.setDoneDate(LocalDateTime.now());
+            task.setCompleted(isCompleted);
         } else {
             task.setDoneDate(task.getCreationDate());
             task.setCompleted(isCompleted);

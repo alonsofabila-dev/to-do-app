@@ -2,6 +2,7 @@ package com.encoramx.backendtodoapp.services;
 
 
 import com.encoramx.backendtodoapp.entities.Task;
+import com.encoramx.backendtodoapp.entities.TaskPair;
 import com.encoramx.backendtodoapp.persistance.DAOTask;
 
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class TaskService {
         this.daoTask = daoTask;
     }
 
-    public LinkedList<Task> getTasks(int page) {
+    public TaskPair<LinkedList<Task>, Integer> getTasks(int page) {
         return daoTask.findTasks(page);
     }
 
