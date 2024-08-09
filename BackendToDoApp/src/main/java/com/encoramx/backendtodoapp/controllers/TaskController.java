@@ -2,6 +2,7 @@ package com.encoramx.backendtodoapp.controllers;
 
 
 import com.encoramx.backendtodoapp.entities.Task;
+import com.encoramx.backendtodoapp.entities.TaskPair;
 import com.encoramx.backendtodoapp.services.TaskService;
 
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class TaskController {
      * @return Response with status code 200 and a list of task with length of 10.
      */
     @GetMapping
-    public ResponseEntity<LinkedList<Task>> getAllTasks(
+    public ResponseEntity<Map<String, Object>>  getAllTasks(
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
 
@@ -42,9 +44,15 @@ public class TaskController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            LinkedList<Task> tasks = taskService.getTasks(page);
+            TaskPair<LinkedList<Task>, Integer> result = taskService.getTasks(page);
+            LinkedList<Task> tasks = result.getLeft();
+            int totalSize = result.getRight();
 
-            return ResponseEntity.status(HttpStatus.OK).body(tasks);
+            Map<String, Object> response = new HashMap<>();
+            response.put("tasks", tasks);
+            response.put("totalSize", totalSize);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
