@@ -5,7 +5,7 @@ import com.encoramx.backendtodoapp.entities.Task;
 
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
@@ -68,7 +68,7 @@ public class DAOTask implements IDAOTask {
         task.setContent(content);
         task.setPriority(Task.Priority.valueOf(priority));
         if (!dueDate.isEmpty()) {
-            task.setDueDate(LocalDateTime.parse(dueDate));
+            task.setDueDate(LocalDate.parse(dueDate));
         }
         task.setDueDate(null);
     }
