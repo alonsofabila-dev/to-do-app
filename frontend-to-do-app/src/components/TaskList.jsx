@@ -100,7 +100,7 @@ export function TaskList() {
                 :
                 <div className="flex items-center justify-center">
                     <div className="text-center">
-                        <h2 className="text-2xl font-bold">It seems you don&apos;t have tasks</h2>
+                        <h2 className="text-2xl font-bold">It seems you don&apos;t have To-Do&apos;s</h2>
                         <h3 className="text-lg text-gray-600">Start creating some of them</h3>
                     </div>
                 </div>
