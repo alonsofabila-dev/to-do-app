@@ -19,7 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.net.URI;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +38,7 @@ class BackendToDoAppApplicationTests {
 				"Lorem ipsum dolor sit amet",
 				Task.Priority.HIGH,
 				false,
-				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+				LocalDate.of(2024, 8, 5)
 		);
 
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
@@ -73,7 +73,7 @@ class BackendToDoAppApplicationTests {
 						"eget semper. Duis pharetra ex sem.",
 				Task.Priority.HIGH,
 				false,
-				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+				LocalDate.of(2024, 8, 5)
 		);
 
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
@@ -138,7 +138,7 @@ class BackendToDoAppApplicationTests {
 				"Lorem ipsum dolor sit amet",
 				Task.Priority.HIGH,
 				false,
-				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+				LocalDate.of(2024, 8, 5)
 		);
 
 		HttpEntity<Task> request = new HttpEntity<>(updatedTask);
@@ -168,7 +168,7 @@ class BackendToDoAppApplicationTests {
 				"Lorem ipsum dolor sit amet",
 				Task.Priority.HIGH,
 				false,
-				LocalDateTime.of(2024, 8, 5, 8, 41, 59)
+				LocalDate.of(2024, 8, 5)
 		);
 
 		HttpEntity<Task> request = new HttpEntity<>(uodatedTask);

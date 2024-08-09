@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import java.util.LinkedList;
 
@@ -35,9 +35,9 @@ public class TaskJsonTest {
     @BeforeEach
     void setUp() {
         tasks = new LinkedList<>();
-        tasks.add(new Task("task 1", Task.Priority.HIGH, true, LocalDateTime.of(2024, 8, 5, 8, 41, 59)));
+        tasks.add(new Task("task 1", Task.Priority.HIGH, true, LocalDate.of(2024, 8, 5)));
         tasks.add(new Task("task 2", Task.Priority.MEDIUM, false));
-        tasks.add(new Task("task 3", Task.Priority.LOW, false, LocalDateTime.of(2024, 9, 5, 8, 41, 59)));
+        tasks.add(new Task("task 3", Task.Priority.LOW, false, LocalDate.of(2024, 9, 5)));
     }
 
 
@@ -66,7 +66,7 @@ public class TaskJsonTest {
         String expected = """
             {
                "content":"task 1",
-               "dueDate":"2024-08-05T08:41:59",
+               "dueDate":"2024-08-05",
                "priority":"HIGH",
                "completed":true
             }
@@ -77,7 +77,7 @@ public class TaskJsonTest {
         assertThat(task.getId()).isGreaterThan(0);
         assertThat(task.getContent()).isEqualTo("task 1");
         assertThat(task.getDueDate())
-                .isEqualTo(LocalDateTime.of(2024, 8, 5, 8, 41, 59));
+                .isEqualTo(LocalDate.of(2024, 8, 5));
         assertThat(task.getPriority()).isEqualTo(Task.Priority.HIGH);
         assertThat(task.isCompleted()).isEqualTo(true);
         assertThat(task.getCreationDate()).isNotNull(); // This will still check if creationDate is set
@@ -105,9 +105,9 @@ public class TaskJsonTest {
     void taskListDeserializationTest() throws IOException {
         String expected = """
         [
-            {"content": "task 1","dueDate": "2024-08-05T08:41:59","completed": true,"priority": "HIGH"},
+            {"content": "task 1","dueDate": "2024-08-05","completed": true,"priority": "HIGH"},
             {"content": "task 2","dueDate": "","completed": false,"priority": "MEDIUM"},
-            {"content": "task 3","dueDate": "2024-09-05T08:41:59","completed": false,"priority": "LOW"}
+            {"content": "task 3","dueDate": "2024-09-05","completed": false,"priority": "LOW"}
         ]
         """;
 

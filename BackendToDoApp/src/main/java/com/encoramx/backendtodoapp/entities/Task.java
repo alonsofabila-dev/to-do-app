@@ -1,5 +1,6 @@
 package com.encoramx.backendtodoapp.entities;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -9,7 +10,7 @@ public class Task {
 
     private final int id;
     private String content;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private boolean isCompleted;
     private Priority priority;
     private final LocalDateTime creationDate;
@@ -20,7 +21,7 @@ public class Task {
         this.creationDate = LocalDateTime.now();
     }
 
-    public Task(String content, Priority priority, boolean isCompleted, LocalDateTime dueDate) {
+    public Task(String content, Priority priority, boolean isCompleted, LocalDate dueDate) {
         this();
         this.content = content;
         this.priority = priority;
@@ -47,11 +48,11 @@ public class Task {
         this.content = content;
     }
 
-    public LocalDateTime getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
