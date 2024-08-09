@@ -1,36 +1,8 @@
-import api from "../api/api.js";
-import {TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE} from "../constants.js";
-import {useEffect, useState} from "react";
-import {toast} from "react-hot-toast";
-import {Space, Table} from "antd";
+import { Space, Table } from "antd";
+import PropTypes from "prop-types";
 
 
-export function TaskList() {
-    const [tasks, setTasks] = useState([])
-    const [number, setNumber] = useState(0)
-
-    useEffect(() => {
-        getTasks();
-    }, [number]);
-
-    const getTasks = () => {
-        api.get(`/tasks?page=${number}`).then(response => {
-
-            setTasks(response.data);
-
-        }).catch(error => {
-            toast.error(error.message, TOAST_SUCCESS_STYLE);
-        })
-    }
-
-    const handleCheckboxChange = (taskId, completed) => {
-        api.patch(`/tasks/${taskId}`, { isCompleted: completed }).then(response => {
-            getTasks();
-            console.log(response.data);
-        }).catch(error => {
-            toast.error(error.message, TOAST_ERROR_STYLE);
-        });
-    }
+export function TaskList({ tasks, onCheckboxChange }) {
 
     const formatDate = (dateToFormat) => {
         if (!dateToFormat) {
@@ -50,7 +22,7 @@ export function TaskList() {
                         type="checkbox"
                         className="w-4 h-4"
                         checked={completed}
-                        onChange={(e) => handleCheckboxChange(record.id, e.target.checked)}
+                        onChange={(e) => onCheckboxChange(record.id, e.target.checked)}
                     />
                 </div>
             ),
@@ -78,7 +50,7 @@ export function TaskList() {
         },
         {
             title: <div className="text-center">Actions</div>,
-            key: 'a',
+            key: 'actions',
             render: () => (
                 <Space size="middle" className="flex items-center justify-center">
                     <button className="bg-blue-400 hover:bg-blue-600 text-white py-2 px-4 rounded">
@@ -94,7 +66,7 @@ export function TaskList() {
     return (
         <div className="bg-white rounded-lg shadow-md p-4">
             {tasks.length > 0 ?
-                <Table dataSource={tasks} columns={columns} pagination={false}  />
+                <Table dataSource={tasks} columns={columns} rowKey="id" pagination={false}  />
                 :
                 <div className="flex items-center justify-center">
                     <div className="text-center">
@@ -106,3 +78,15 @@ export function TaskList() {
         </div>
     )
 }
+
+TaskList.propTypes = {
+    tasks: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        content: PropTypes.string.isRequired,
+        priority: PropTypes.string,
+        completed: PropTypes.bool.isRequired,
+        dueDate: PropTypes.string,
+        creationDate: PropTypes.string,
+    })).isRequired,
+    onCheckboxChange: PropTypes.func.isRequired,
+};

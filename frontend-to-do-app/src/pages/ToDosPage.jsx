@@ -1,16 +1,45 @@
-import api from "../api/api.js";
 import { Modal } from 'antd';
 import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../constants.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TaskList } from "../components/TaskList.jsx";
 import { toast } from "react-hot-toast";
+import { createTodo, getToDos, updateComplete } from "../services/serviceTasks.js";
+
 
 export function ToDosPage() {
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [content, setContent] = useState("");
     const [dueDate, setDueDate] = useState("");
-    const [priority, setPriority] = useState("");
+    const [priority, setPriority] = useState("LOW");
+
+    const [tasks, setTasks] = useState([])
+    const [number, setNumber] = useState(0)
+
+    useEffect(() => {
+        getTasks();
+    }, [number]);
+
+    const getTasks = () => {
+        getToDos(number).then(response => {
+            setTasks(response.data);
+        }).catch(error => {
+            toast.error(error.message);
+        })
+    }
+
+    const handleCheckboxChange = (taskId, completed) => {
+        updateComplete(taskId, completed).then(response => {
+            setTasks(prevTasks =>
+                prevTasks.map(task =>
+                    task.id === taskId ? { ...task, completed } : task
+                )
+            );
+            console.log(response.data)
+        }).catch(error => {
+            toast.error(error.message, TOAST_ERROR_STYLE);
+        });
+    };
 
     const showModal = () => {
         setOpen(true);
@@ -18,27 +47,25 @@ export function ToDosPage() {
 
     const handleOk = () => {
         setConfirmLoading(true);
-
-        api.post("/tasks", {
-            content: content,
-            dueDate: dueDate,
-            priority: priority
-        }).then(response => {
+        createTodo(content, dueDate, priority).then(response => {
             setTimeout(() => {
                 setOpen(false);
                 setConfirmLoading(false);
+                console.log(response);
                 toast.success(response.data, TOAST_SUCCESS_STYLE);
             }, 1000);
+            if (response.status === 201) {
+                getTasks()
+            }
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
-        });
-
+        })
     };
 
     const handleCancel = () => {
         setContent("");
         setDueDate("");
-        setPriority("");
+        setPriority("LOW");
         setConfirmLoading(false);
         setOpen(false);
     };
@@ -111,7 +138,7 @@ export function ToDosPage() {
                 </Modal>
             </div>
 
-            <TaskList/>
+            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} />
         </div>
     )
 }
