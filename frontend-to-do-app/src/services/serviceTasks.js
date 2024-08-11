@@ -28,3 +28,7 @@ export const updateTodo = (taskId, content, dueDate, priority) => {
 export const getAverages = () => {
     return api.get(`/tasks/averages`);
 }
+
+export const deleteTodo = (taskId) => {
+    return api.delete(`/tasks/${taskId}`);
+}

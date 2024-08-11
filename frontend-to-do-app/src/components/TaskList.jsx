@@ -2,7 +2,7 @@ import { Modal, Space, Table } from "antd";
 import PropTypes from "prop-types";
 import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../constants.js";
 import { useState } from "react";
-import { updateTodo } from "../services/serviceTasks.js";
+import {deleteTodo, updateTodo} from "../services/serviceTasks.js";
 import { toast } from "react-hot-toast";
 
 
@@ -17,6 +17,15 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
         }
         return new Date(dateToFormat).toLocaleDateString('en-CA');
     };
+
+    const deleteTask = (task) => {
+        deleteTodo(task.id).then(response => {
+            refreshTasks();
+            toast.success(response.data, TOAST_SUCCESS_STYLE);
+        }).catch((error) => {
+            toast.error(error.message, TOAST_ERROR_STYLE);
+        })
+    }
 
     const showModal = (task) => {
         setSelectedTask(task);
@@ -39,11 +48,10 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
                 })
                 .catch(error => {
                     handleCancel();
-                    toast.error(error.message || "Something went wrong", TOAST_ERROR_STYLE);
+                    toast.error(error.message, TOAST_ERROR_STYLE);
                 })
         }
     };
-
 
     const handleCancel = () => {
         setConfirmLoading(false);
@@ -98,7 +106,10 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
                     >
                         Edit
                     </button>
-                    <button className="bg-red-400 hover:bg-red-600 text-white py-2 px-4 rounded">
+                    <button
+                        className="bg-red-400 hover:bg-red-600 text-white py-2 px-4 rounded"
+                        onClick={() => deleteTask(record)}
+                    >
                         Delete
                     </button>
                 </Space>
