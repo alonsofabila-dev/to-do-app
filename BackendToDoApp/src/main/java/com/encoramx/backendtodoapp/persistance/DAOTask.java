@@ -6,9 +6,11 @@ import com.encoramx.backendtodoapp.entities.TaskPair;
 
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +34,44 @@ public class DAOTask implements IDAOTask {
         return new TaskPair<>(new LinkedList<>(sublist), tasksList.size());
     }
 
+    /**
+     * @return dict with the average time for task to be done by priority.
+     */
+    @Override
+    public Map<String, Object> averageDoneTimePerPriority() {
+        // get the difference between creation date and done date, ans get average.
+        Double totalAverage = tasksList.stream()
+                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
+                .average()
+                .orElse(0.0);
+
+        // filter by priority, then get the difference between creation date and done date, ans get average.
+        Double lowAverage = tasksList.stream()
+                .filter(task -> Task.Priority.LOW.equals(task.getPriority()))
+                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
+                .average()
+                .orElse(0.0);
+
+        Double mediumAverage = tasksList.stream()
+                .filter(task -> Task.Priority.MEDIUM.equals(task.getPriority()))
+                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
+                .average()
+                .orElse(0.0);
+
+        Double highAverage = tasksList.stream()
+                .filter(task -> Task.Priority.HIGH.equals(task.getPriority()))
+                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
+                .average()
+                .orElse(0.0);
+
+        return Map.of(
+                "totalAverage", totalAverage,
+                "lowAverage", lowAverage,
+                "mediumAverage", mediumAverage,
+                "highAverage", highAverage
+        );
+    }
+
 
     /**
      * @param id (int, Required) ID to search in the list.
@@ -39,7 +79,6 @@ public class DAOTask implements IDAOTask {
      */
     @Override
     public Task findById(int id) {
-        // Search for task with existing id.
         return getTask(id);
     }
 
@@ -71,10 +110,11 @@ public class DAOTask implements IDAOTask {
         Task task = getTask(id);
         task.setContent(content);
         task.setPriority(Task.Priority.valueOf(priority));
-        if (!dueDate.isEmpty()) {
+        if (dueDate != null && !dueDate.isEmpty()) {
             task.setDueDate(LocalDate.parse(dueDate));
+        } else {
+            task.setDueDate(null);
         }
-        task.setDueDate(null);
     }
 
 
@@ -94,8 +134,18 @@ public class DAOTask implements IDAOTask {
         }
     }
 
+    /**
+     * @param id (int, Required) ID of the task to be deleted.
+     */
+    @Override
+    public void deleteTask(int id) {
+        Task task = getTask(id);
+        tasksList.remove(task);
+    }
+
 
     public Task getTask(int id) {
+        // search fos task with existing ID.
         return tasksList.stream()
                 .filter(t -> t.getId() == id)
                 .findFirst()

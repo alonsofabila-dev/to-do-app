@@ -60,6 +60,23 @@ public class TaskController {
 
     }
 
+    /**
+     * @return Response with status code 200.
+     */
+    @GetMapping("/averages")
+    public ResponseEntity<Map<String, Object>> getAverageTasks() {
+        try {
+
+            Map<String, Object> response = new HashMap<>(taskService.calculateAverageCompletionTimes());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     /**
      * @param requestedId (int, Required): The ID of the task to be requested.
@@ -99,8 +116,8 @@ public class TaskController {
     public ResponseEntity<String> createTask(@RequestBody Task task) {
 
         try {
-            if (task == null || task.getPriority() == null) {
-                logger.warn("Task is null or task priority is null");
+            if (task.getContent().isBlank() || task.getPriority() == null) {
+                logger.warn("Task has no content or task priority is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
             }
 
@@ -173,5 +190,27 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
 
+    }
+
+
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @return Response with status code 200.
+     */
+    @DeleteMapping("/{requestedId}")
+    public ResponseEntity<String> deleteTask(@PathVariable int requestedId) {
+        try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            taskService.deleteTask(requestedId);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task deleted successfully");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting task");
+        }
     }
 }

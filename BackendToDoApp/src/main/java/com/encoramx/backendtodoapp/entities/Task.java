@@ -62,6 +62,9 @@ public class Task {
         this.doneDate = doneDate;
     }
 
+    public LocalDateTime getDoneDate() {
+        return doneDate;
+    }
 
     public boolean isCompleted() {
         return isCompleted;
