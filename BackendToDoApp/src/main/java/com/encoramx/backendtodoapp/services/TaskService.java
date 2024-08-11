@@ -8,6 +8,7 @@ import com.encoramx.backendtodoapp.persistance.DAOTask;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 
 @Service
@@ -21,6 +22,10 @@ public class TaskService {
 
     public TaskPair<LinkedList<Task>, Integer> getTasks(int page) {
         return daoTask.findTasks(page);
+    }
+
+    public Map<String, Object> calculateAverageCompletionTimes() {
+        return daoTask.averageDoneTimePerPriority();
     }
 
     public Task getTaskById(int id) {
