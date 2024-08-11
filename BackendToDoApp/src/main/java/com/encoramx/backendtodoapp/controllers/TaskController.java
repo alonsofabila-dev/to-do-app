@@ -191,4 +191,22 @@ public class TaskController {
         }
 
     }
+
+
+    @DeleteMapping("/{requestedId}")
+    public ResponseEntity<String> deleteTask(@PathVariable int requestedId) {
+        try {
+            if (requestedId <= 0) {
+                logger.warn("Invalid Id");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            taskService.deleteTask(requestedId);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Task deleted successfully");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting task");
+        }
+    }
 }

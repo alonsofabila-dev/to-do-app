@@ -43,4 +43,8 @@ public class TaskService {
     public void updateCompletedTask(int id, boolean isCompleted) {
         daoTask.updateCompleted(id, isCompleted);
     }
+
+    public void deleteTask(int id) {
+        daoTask.deleteTask(id);
+    }
 }

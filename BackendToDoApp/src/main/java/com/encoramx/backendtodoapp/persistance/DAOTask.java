@@ -134,6 +134,12 @@ public class DAOTask implements IDAOTask {
         }
     }
 
+    @Override
+    public void deleteTask(int id) {
+        Task task = getTask(id);
+        tasksList.remove(task);
+    }
+
 
     public Task getTask(int id) {
         // search fos task with existing ID.

@@ -15,4 +15,5 @@ public interface IDAOTask {
     void createTask(Task task);
     void updateTask(int id, String content, String dueDate, String priority);
     void updateCompleted(int id, boolean isCompleted);
+    void deleteTask(int id);
 }
