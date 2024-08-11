@@ -134,6 +134,9 @@ public class DAOTask implements IDAOTask {
         }
     }
 
+    /**
+     * @param id (int, Required) ID of the task to be deleted.
+     */
     @Override
     public void deleteTask(int id) {
         Task task = getTask(id);

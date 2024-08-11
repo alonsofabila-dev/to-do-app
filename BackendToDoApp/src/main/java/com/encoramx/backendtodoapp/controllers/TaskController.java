@@ -193,6 +193,10 @@ public class TaskController {
     }
 
 
+    /**
+     * @param requestedId (int, Required) the ID of the task to be updated.
+     * @return Response with status code 200.
+     */
     @DeleteMapping("/{requestedId}")
     public ResponseEntity<String> deleteTask(@PathVariable int requestedId) {
         try {
