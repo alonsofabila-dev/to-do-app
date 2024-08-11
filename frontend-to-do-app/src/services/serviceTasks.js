@@ -1,5 +1,6 @@
 import api from './api.js';
 
+
 export const getToDos = (page = 0) => {
     return api.get(`/tasks?page=${page}`);
 };
@@ -14,4 +15,16 @@ export const createTodo = (content, dueDate, priority) => {
         dueDate: dueDate,
         priority: priority
     })
+}
+
+export const updateTodo = (taskId, content, dueDate, priority) => {
+    return api.put(`/tasks/${taskId}`, {
+        content: content,
+        dueDate: dueDate,
+        priority: priority
+    })
+}
+
+export const getAverages = () => {
+    return api.get(`/tasks/averages`);
 }

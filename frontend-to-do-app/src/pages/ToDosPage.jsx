@@ -3,7 +3,8 @@ import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../con
 import { useEffect, useState } from "react";
 import { TaskList } from "../components/TaskList.jsx";
 import { toast } from "react-hot-toast";
-import { createTodo, getToDos, updateComplete } from "../services/serviceTasks.js";
+import { createTodo, getToDos, updateComplete, getAverages } from "../services/serviceTasks.js";
+import { AveragesCard } from "../components/AveragesCard.jsx";
 
 
 export function ToDosPage() {
@@ -16,6 +17,7 @@ export function ToDosPage() {
     const [tasks, setTasks] = useState([])
     const [number, setNumber] = useState(1)
     const [totalTasks, setTotalTasks] = useState()
+    const [averages, setAverages] = useState()
 
     useEffect(() => {
         getTasks();
@@ -25,24 +27,27 @@ export function ToDosPage() {
         getToDos(number - 1).then(response => {
             setTasks(response.data.tasks);
             setTotalTasks(response.data.totalSize);
+            average();
         }).catch(error => {
             toast.error(error.message);
         })
     }
 
     const handleCheckboxChange = (taskId, completed) => {
-        console.log(taskId, completed);
-        updateComplete(taskId, completed).then(response => {
-            setTasks(prevTasks =>
-                prevTasks.map(task =>
-                    task.id === taskId ? { ...task, completed } : task
-                )
-            );
-            console.log(response.data)
+        updateComplete(taskId, completed).then(() => {
+            getTasks();
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
         });
     };
+
+    const average = () => {
+        getAverages().then(response => {
+            setAverages(response.data)
+        }).catch(error => {
+            toast.error(error.message);
+        })
+    }
 
     const showModal = () => {
         setOpen(true);
@@ -52,18 +57,16 @@ export function ToDosPage() {
         setConfirmLoading(true);
         createTodo(content, dueDate, priority).then(response => {
             setTimeout(() => {
-                setOpen(false);
-                setConfirmLoading(false);
-                setContent("");
-                setDueDate("");
-                setPriority("LOW");
+                handleCancel()
                 toast.success(response.data, TOAST_SUCCESS_STYLE);
             }, 250);
             if (response.status === 201) {
                 getTasks()
             }
-        }).catch(error => {
-            toast.error(error.message, TOAST_ERROR_STYLE);
+        }).catch(() => {
+            setConfirmLoading(false);
+            setOpen(false);
+            toast.error('Missing Content', TOAST_ERROR_STYLE);
         })
     };
 
@@ -77,10 +80,10 @@ export function ToDosPage() {
 
 
     return (
-        <div className="p-4">
+        <div className="p-2">
 
-            <div className="mb-4">
-                <button className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded" onClick={showModal}>
+            <div className="mb-3">
+                <button className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded text-sm" onClick={showModal}>
                     New To Do
                 </button>
                 <Modal
@@ -143,10 +146,10 @@ export function ToDosPage() {
                 </Modal>
             </div>
 
-            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange}/>
+            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} refreshTasks={getTasks}/>
 
-            <div className="mt-4 flex justify-center">
-                <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="mt-3 flex justify-center">
+                <div className="bg-white rounded-lg shadow-md p-2">
                     <Pagination
                         align="center"
                         current={number}
@@ -156,6 +159,8 @@ export function ToDosPage() {
                     />
                 </div>
             </div>
+
+            <AveragesCard averages={averages} />
         </div>
     )
 }
