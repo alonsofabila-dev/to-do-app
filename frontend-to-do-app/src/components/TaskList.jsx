@@ -10,13 +10,8 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-
-    const formatDate = (dateToFormat) => {
-        if (!dateToFormat) {
-            return dateToFormat;
-        }
-        return new Date(dateToFormat).toLocaleDateString('en-CA');
-    };
+    const [priorityDirection, setPriorityDirection] = useState("");
+    const [dueDateDirection, setDueDateDirection] = useState()
 
     const deleteTask = (task) => {
         deleteTodo(task.id).then(response => {
@@ -57,6 +52,26 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
         setConfirmLoading(false);
         setOpen(false);
     };
+    
+    const handlePrioritySort = () => {
+        let direction = "asc";
+        if (priorityDirection === "asc") {
+            direction = "desc";
+        }
+        setPriorityDirection(direction);
+
+        refreshTasks("", "", "", "", priorityDirection);
+    }
+
+    const handleDueDateSort = () => {
+        let direction = "asc";
+        if (dueDateDirection === "asc") {
+            direction = "desc";
+        }
+        setDueDateDirection(direction);
+
+        refreshTasks("", "", "", "", "", dueDateDirection);
+    }
 
     const columns = [
         {
@@ -75,7 +90,7 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
             ),
         },
         {
-            title: 'Name',
+            title: 'Content',
             dataIndex: 'content',
             key: 'content',
             render: (content, record) => (
@@ -85,15 +100,14 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
             ),
         },
         {
-            title: 'Priority',
+            title: <a onClick={handlePrioritySort}>Priority</a>,
             dataIndex: 'priority',
             key: 'priority',
         },
         {
-            title: 'Due Date',
+            title: <a onClick={handleDueDateSort}>Due Date</a>,
             dataIndex: 'dueDate',
             key: 'dueDate',
-            render: (dueDate) => formatDate(dueDate),
         },
         {
             title: <div className="text-center">Actions</div>,

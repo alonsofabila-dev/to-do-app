@@ -2,9 +2,6 @@ import PropTypes from "prop-types";
 
 
 export function AveragesCard({ averages }) {
-
-    console.log(averages)
-
     return (
         <div className="mt-3 flex justify-center">
             <div className="bg-white rounded-lg shadow-md p-6 w-3/4 flex">

@@ -3,8 +3,9 @@ import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../con
 import { useEffect, useState } from "react";
 import { TaskList } from "../components/TaskList.jsx";
 import { toast } from "react-hot-toast";
-import { createTodo, getToDos, updateComplete, getAverages } from "../services/serviceTasks.js";
+import { createTodo, updateComplete, getAverages, getFilteredToDos } from "../services/serviceTasks.js";
 import { AveragesCard } from "../components/AveragesCard.jsx";
+import { SearchTaskForm } from "../components/SearchTaskForm.jsx";
 
 
 export function ToDosPage() {
@@ -13,6 +14,7 @@ export function ToDosPage() {
     const [content, setContent] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [priority, setPriority] = useState("LOW");
+    const [isCompleted, setIsCompleted] = useState("");
 
     const [tasks, setTasks] = useState([])
     const [number, setNumber] = useState(1)
@@ -20,11 +22,12 @@ export function ToDosPage() {
     const [averages, setAverages] = useState()
 
     useEffect(() => {
-        getTasks();
+        getFilteredTasks();
     }, [number]);
 
-    const getTasks = () => {
-        getToDos(number - 1).then(response => {
+    const getFilteredTasks = (content, priority, dueDate, isCompleted, sortPriorityDirection = "", sortDueDateDirection = "") => {
+        setIsCompleted(isCompleted)
+        getFilteredToDos(number - 1, content, priority, dueDate, isCompleted, sortPriorityDirection, sortDueDateDirection).then(response => {
             setTasks(response.data.tasks);
             setTotalTasks(response.data.totalSize);
             average();
@@ -35,7 +38,7 @@ export function ToDosPage() {
 
     const handleCheckboxChange = (taskId, completed) => {
         updateComplete(taskId, completed).then(() => {
-            getTasks();
+            getFilteredTasks(content, priority, dueDate, isCompleted);
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
         });
@@ -61,7 +64,7 @@ export function ToDosPage() {
                 toast.success(response.data, TOAST_SUCCESS_STYLE);
             }, 250);
             if (response.status === 201) {
-                getTasks()
+                getFilteredTasks()
             }
         }).catch(() => {
             setConfirmLoading(false);
@@ -81,6 +84,8 @@ export function ToDosPage() {
 
     return (
         <div className="p-2">
+
+            <SearchTaskForm filteredSearch={getFilteredTasks}/>
 
             <div className="mb-3">
                 <button className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded text-sm" onClick={showModal}>
@@ -110,10 +115,10 @@ export function ToDosPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="content">Due Date</label>
+                            <label htmlFor="dueDate">Due Date</label>
                             <div>
                                 <input
-                                    id="content"
+                                    id="dueDate"
                                     type="date"
                                     value={dueDate}
                                     required={false}
@@ -124,10 +129,10 @@ export function ToDosPage() {
                         </div>
 
                         <div>
-                            <label htmlFor="task-priority">Status</label>
+                            <label htmlFor="priority">Priority</label>
                             <div>
                                 <select
-                                    id="task-priority"
+                                    id="priority"
                                     value={priority}
                                     required={true}
                                     onChange={(e) => setPriority(e.target.value)}
@@ -146,7 +151,7 @@ export function ToDosPage() {
                 </Modal>
             </div>
 
-            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} refreshTasks={getTasks}/>
+            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} refreshTasks={getFilteredTasks}/>
 
             <div className="mt-3 flex justify-center">
                 <div className="bg-white rounded-lg shadow-md p-2">
