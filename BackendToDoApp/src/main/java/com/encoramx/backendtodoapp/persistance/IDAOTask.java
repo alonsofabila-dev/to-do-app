@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 public interface IDAOTask {
-    TaskPair<LinkedList<Task>, Integer> findTasks(int page);
+    TaskPair<LinkedList<Task>, Integer> findTasks(int page, String content, String dueDate, String priority, Boolean isCompleted, String sortPriorityDirection, String sortDueDateDirection);
     Map<String, Object> averageDoneTimePerPriority();
     Task findById(int id);
     void createTask(Task task);

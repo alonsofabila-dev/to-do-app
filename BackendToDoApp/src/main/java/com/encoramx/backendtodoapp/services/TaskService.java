@@ -20,8 +20,8 @@ public class TaskService {
         this.daoTask = daoTask;
     }
 
-    public TaskPair<LinkedList<Task>, Integer> getTasks(int page) {
-        return daoTask.findTasks(page);
+    public TaskPair<LinkedList<Task>, Integer> getTasks(int page, String content, String dueDate, String priority, Boolean isCompleted, String sortPriorityDirection, String sortDueDateDirection) {
+        return daoTask.findTasks(page, content, dueDate, priority, isCompleted, sortPriorityDirection, sortDueDateDirection);
     }
 
     public Map<String, Object> calculateAverageCompletionTimes() {
