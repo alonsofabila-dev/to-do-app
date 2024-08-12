@@ -1,8 +1,8 @@
 import api from './api.js';
 
 
-export const getToDos = (page = 0) => {
-    return api.get(`/tasks?page=${page}`);
+export const getFilteredToDos = (page = 0, content = "", priority = "", dueDate = "", isCompleted = "", sortPriorityDirection = "", sortDueDateDirection = "") => {
+    return api.get(`/tasks?page=${page}&content=${content}&priority=${priority}&dueDate=${dueDate}&isCompleted=${isCompleted}&sortPriorityDirection=${sortPriorityDirection}&sortDueDateDirection=${sortDueDateDirection}`);
 };
 
 export const updateComplete = (taskId, completed) => {
