@@ -35,7 +35,13 @@ public class TaskController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>>  getAllTasks(
-            @RequestParam(value = "page", defaultValue = "0") int page
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "dueDate", required = false) String dueDate,
+            @RequestParam(value = "priority", required = false) String priority,
+            @RequestParam(value = "isCompleted", required = false) Boolean isCompleted,
+            @RequestParam(value = "sortPriorityDirection", required = false) String sortPriorityDirection,
+            @RequestParam(value = "sortDueDateDirection", required = false) String sortDueDateDirection
     ) {
 
         try {
@@ -44,7 +50,7 @@ public class TaskController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            TaskPair<LinkedList<Task>, Integer> result = taskService.getTasks(page);
+            TaskPair<LinkedList<Task>, Integer> result = taskService.getTasks(page, content, dueDate, priority, isCompleted, sortPriorityDirection, sortDueDateDirection);
             LinkedList<Task> tasks = result.getLeft();
             int totalSize = result.getRight();
 
