@@ -15,7 +15,7 @@ export const TaskListProvider = ({ children }) => {
 
     useEffect(() => {
         refreshTasks();
-    }, []);
+    }, [filters, sorting]);
 
     const refreshTasks = () => {
         const { number, content, priority, dueDate, isCompleted } = filters;

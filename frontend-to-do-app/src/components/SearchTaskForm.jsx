@@ -1,6 +1,6 @@
 import { PRIORITY_OPTIONS } from "../constants.js";
 import { useState, useContext } from "react";
-import { TaskListContext } from "./TaskListContext.jsx"; // Import the context
+import { TaskListContext } from "./TaskListContext.jsx";
 
 export function SearchTaskForm() {
     const { setFilters } = useContext(TaskListContext); // Destructure setFilters from context

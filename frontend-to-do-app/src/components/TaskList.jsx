@@ -80,6 +80,18 @@ export function TaskList({ tasks, onCheckboxChange }) {
         refreshTasks();
     };
 
+    const getSortIndicator = (direction) => {
+        switch (direction) {
+            case 'asc':
+                return '▲';
+            case 'desc':
+                return '▼';
+            case '':
+            default:
+                return '—';
+        }
+    };
+
     const columns = [
         {
             title: <div className="text-center">Done</div>,
@@ -107,12 +119,12 @@ export function TaskList({ tasks, onCheckboxChange }) {
             ),
         },
         {
-            title: <a onClick={handlePrioritySort}>Priority &#x21C5;</a>,
+            title: <a onClick={handlePrioritySort}>Priority {getSortIndicator(sorting.sortPriorityDirection)}</a>,
             dataIndex: 'priority',
             key: 'priority',
         },
         {
-            title: <a onClick={handleDueDateSort}>Due Date &#x21C5;</a>,
+            title: <a onClick={handleDueDateSort}>Due Date {getSortIndicator(sorting.sortDueDateDirection)}</a>,
             dataIndex: 'dueDate',
             key: 'dueDate',
         },
