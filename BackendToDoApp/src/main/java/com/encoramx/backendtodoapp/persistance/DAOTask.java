@@ -2,18 +2,14 @@ package com.encoramx.backendtodoapp.persistance;
 
 
 import com.encoramx.backendtodoapp.entities.Task;
-import com.encoramx.backendtodoapp.entities.TaskPair;
 
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Repository
@@ -29,7 +25,6 @@ public class DAOTask implements IDAOTask {
     public LinkedList<Task> findTasks() {
         return new LinkedList<>(tasksList);
     }
-
 
 
     /**
