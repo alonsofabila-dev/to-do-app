@@ -1,91 +1,65 @@
+import { useContext, useState } from "react";
 import { Modal, Pagination } from 'antd';
 import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../constants.js";
-import { useEffect, useState } from "react";
-import { TaskList } from "../components/TaskList.jsx";
 import { toast } from "react-hot-toast";
-import { createTodo, updateComplete, getAverages, getFilteredToDos } from "../services/serviceTasks.js";
+import { createTodo, updateComplete } from "../services/serviceTasks.js";
+import { TaskList } from "../components/TaskList.jsx";
 import { AveragesCard } from "../components/AveragesCard.jsx";
 import { SearchTaskForm } from "../components/SearchTaskForm.jsx";
-
+import { TaskListContext } from "../components/TaskListContext.jsx";
 
 export function ToDosPage() {
+    const {
+        tasks,
+        totalTasks,
+        filters,
+        setFilters,
+        refreshTasks,
+        averages
+    } = useContext(TaskListContext);
+
     const [open, setOpen] = useState(false);
-    const [confirmLoading, setConfirmLoading] = useState(false);
     const [content, setContent] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [priority, setPriority] = useState("LOW");
-    const [isCompleted, setIsCompleted] = useState("");
-
-    const [tasks, setTasks] = useState([])
-    const [number, setNumber] = useState(1)
-    const [totalTasks, setTotalTasks] = useState()
-    const [averages, setAverages] = useState()
-
-    useEffect(() => {
-        getFilteredTasks();
-    }, [number]);
-
-    const getFilteredTasks = (content, priority, dueDate, isCompleted, sortPriorityDirection = "", sortDueDateDirection = "") => {
-        setIsCompleted(isCompleted)
-        getFilteredToDos(number - 1, content, priority, dueDate, isCompleted, sortPriorityDirection, sortDueDateDirection).then(response => {
-            setTasks(response.data.tasks);
-            setTotalTasks(response.data.totalSize);
-            average();
-        }).catch(error => {
-            toast.error(error.message);
-        })
-    }
 
     const handleCheckboxChange = (taskId, completed) => {
         updateComplete(taskId, completed).then(() => {
-            getFilteredTasks("", "", "", isCompleted);
+            refreshTasks();
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
         });
     };
-
-    const average = () => {
-        getAverages().then(response => {
-            setAverages(response.data)
-        }).catch(error => {
-            toast.error(error.message);
-        })
-    }
 
     const showModal = () => {
         setOpen(true);
     };
 
     const handleOk = () => {
-        setConfirmLoading(true);
         createTodo(content, dueDate, priority).then(response => {
             setTimeout(() => {
-                handleCancel()
+                handleCancel();
                 toast.success(response.data, TOAST_SUCCESS_STYLE);
             }, 250);
             if (response.status === 201) {
-                getFilteredTasks()
+                refreshTasks();
             }
         }).catch(() => {
-            setConfirmLoading(false);
             setOpen(false);
             toast.error('Missing Content', TOAST_ERROR_STYLE);
-        })
+        });
     };
 
     const handleCancel = () => {
         setContent("");
         setDueDate("");
         setPriority("LOW");
-        setConfirmLoading(false);
         setOpen(false);
     };
 
-
     return (
         <div className="p-2">
-
-            <SearchTaskForm filteredSearch={getFilteredTasks}/>
+            <SearchTaskForm />
 
             <div className="mb-3">
                 <button className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded text-sm" onClick={showModal}>
@@ -95,11 +69,9 @@ export function ToDosPage() {
                     title="Create New To Do"
                     open={open}
                     onOk={handleOk}
-                    confirmLoading={confirmLoading}
                     onCancel={handleCancel}
                 >
                     <form className="space-y-6">
-
                         <div>
                             <label htmlFor="content">Content</label>
                             <div>
@@ -146,26 +118,25 @@ export function ToDosPage() {
                                 </select>
                             </div>
                         </div>
-
                     </form>
                 </Modal>
             </div>
 
-            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} refreshTasks={getFilteredTasks}/>
+            <TaskList tasks={tasks} onCheckboxChange={handleCheckboxChange} refreshTasks={refreshTasks} />
 
             <div className="mt-3 flex justify-center">
                 <div className="bg-white rounded-lg shadow-md p-2">
                     <Pagination
                         align="center"
-                        current={number}
+                        current={filters.number}
                         total={totalTasks}
                         pageSize={10}
-                        onChange={(page) => setNumber(page)}
+                        onChange={(page) => setFilters(prevFilters => ({ ...prevFilters, number: page }))}
                     />
                 </div>
             </div>
 
             <AveragesCard averages={averages} />
         </div>
-    )
+    );
 }

@@ -2,16 +2,17 @@ import { Modal, Space, Table } from "antd";
 import PropTypes from "prop-types";
 import { PRIORITY_OPTIONS, TOAST_ERROR_STYLE, TOAST_SUCCESS_STYLE } from "../constants.js";
 import { useState } from "react";
-import {deleteTodo, updateTodo} from "../services/serviceTasks.js";
+import { deleteTodo, updateTodo } from "../services/serviceTasks.js";
 import { toast } from "react-hot-toast";
+import { useContext } from "react";
+import { TaskListContext } from "./TaskListContext.jsx"; // Import the context
 
-
-export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
+export function TaskList({ tasks, onCheckboxChange }) {
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [priorityDirection, setPriorityDirection] = useState("");
-    const [dueDateDirection, setDueDateDirection] = useState()
+
+    const { refreshTasks, sorting, setSorting } = useContext(TaskListContext);
 
     const deleteTask = (task) => {
         deleteTodo(task.id).then(response => {
@@ -52,26 +53,45 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
         setConfirmLoading(false);
         setOpen(false);
     };
-    
-    const handlePrioritySort = () => {
-        let direction = "asc";
-        if (priorityDirection === "asc") {
-            direction = "desc";
-        }
-        setPriorityDirection(direction);
 
-        refreshTasks("", "", "", "", priorityDirection);
-    }
+    const handlePrioritySort = () => {
+        let newDirection;
+        if (sorting.sortPriorityDirection === "asc") {
+            newDirection = "desc";
+        } else if (sorting.sortPriorityDirection === "desc") {
+            newDirection = "";
+        } else {
+            newDirection = "asc";
+        }
+        setSorting({ ...sorting, sortPriorityDirection: newDirection, sortDueDateDirection: '' });
+        refreshTasks();
+    };
 
     const handleDueDateSort = () => {
-        let direction = "asc";
-        if (dueDateDirection === "asc") {
-            direction = "desc";
+        let newDirection;
+        if (sorting.sortDueDateDirection === "asc") {
+            newDirection = "desc";
+        } else if (sorting.sortDueDateDirection === "desc") {
+            newDirection = "";
+        } else {
+            newDirection = "asc";
         }
-        setDueDateDirection(direction);
+        setSorting({ ...sorting, sortDueDateDirection: newDirection, sortPriorityDirection: '' });
+        refreshTasks();
+    };
 
-        refreshTasks("", "", "", "", "", dueDateDirection);
-    }
+    const getSortIndicator = (direction) => {
+        switch (direction) {
+            case 'asc':
+                return '▲';
+            case 'desc':
+                return '▼';
+            case '':
+                return '—';
+            default:
+                return '';
+        }
+    };
 
     const columns = [
         {
@@ -100,12 +120,12 @@ export function TaskList({ tasks, onCheckboxChange, refreshTasks }) {
             ),
         },
         {
-            title: <a onClick={handlePrioritySort}>Priority</a>,
+            title: <a onClick={handlePrioritySort}>Priority {getSortIndicator(sorting.sortPriorityDirection)}</a>,
             dataIndex: 'priority',
             key: 'priority',
         },
         {
-            title: <a onClick={handleDueDateSort}>Due Date</a>,
+            title: <a onClick={handleDueDateSort}>Due Date {getSortIndicator(sorting.sortDueDateDirection)}</a>,
             dataIndex: 'dueDate',
             key: 'dueDate',
         },
@@ -216,5 +236,4 @@ TaskList.propTypes = {
         })
     ).isRequired,
     onCheckboxChange: PropTypes.func.isRequired,
-    refreshTasks: PropTypes.func.isRequired,
 };
