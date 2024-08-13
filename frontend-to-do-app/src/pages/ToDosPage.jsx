@@ -38,7 +38,7 @@ export function ToDosPage() {
 
     const handleCheckboxChange = (taskId, completed) => {
         updateComplete(taskId, completed).then(() => {
-            getFilteredTasks(content, priority, dueDate, isCompleted);
+            getFilteredTasks("", "", "", isCompleted);
         }).catch(error => {
             toast.error(error.message, TOAST_ERROR_STYLE);
         });
