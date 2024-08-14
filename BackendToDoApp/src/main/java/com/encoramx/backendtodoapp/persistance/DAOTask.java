@@ -5,11 +5,9 @@ import com.encoramx.backendtodoapp.entities.Task;
 
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
-import java.util.Map;
 
 
 @Repository
@@ -31,38 +29,8 @@ public class DAOTask implements IDAOTask {
      * @return dict with the average time for task to be done by priority.
      */
     @Override
-    public Map<String, Object> averageDoneTimePerPriority() {
-        // get the difference between creation date and done date, ans get average.
-        Double totalAverage = tasksList.stream()
-                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
-                .average()
-                .orElse(0.0);
-
-        // filter by priority, then get the difference between creation date and done date, ans get average.
-        Double lowAverage = tasksList.stream()
-                .filter(task -> Task.Priority.LOW.equals(task.getPriority()))
-                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
-                .average()
-                .orElse(0.0);
-
-        Double mediumAverage = tasksList.stream()
-                .filter(task -> Task.Priority.MEDIUM.equals(task.getPriority()))
-                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
-                .average()
-                .orElse(0.0);
-
-        Double highAverage = tasksList.stream()
-                .filter(task -> Task.Priority.HIGH.equals(task.getPriority()))
-                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
-                .average()
-                .orElse(0.0);
-
-        return Map.of(
-                "totalAverage", totalAverage,
-                "lowAverage", lowAverage,
-                "mediumAverage", mediumAverage,
-                "highAverage", highAverage
-        );
+    public LinkedList<Task> averageDoneTimePerPriority() {
+        return new LinkedList<>(tasksList);
     }
 
 
