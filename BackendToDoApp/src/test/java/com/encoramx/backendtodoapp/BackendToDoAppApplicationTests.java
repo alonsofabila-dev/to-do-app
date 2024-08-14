@@ -46,13 +46,11 @@ class BackendToDoAppApplicationTests {
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 		URI locationOfNewTask = createResponse.getHeaders().getLocation();
-
 		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
-
 		Number id = documentContext.read("$.id");
 
 		assertThat(id).isNotNull();
@@ -92,17 +90,14 @@ class BackendToDoAppApplicationTests {
 		);
 
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
-
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 		URI locationOfNewTask = createResponse.getHeaders().getLocation();
-
 		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
-
 		Number id = documentContext.read("$.id");
 
 		assertThat(id).isNotNull();
@@ -126,11 +121,14 @@ class BackendToDoAppApplicationTests {
 		);
 
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 		URI locationOfNewTask = createResponse.getHeaders().getLocation();
 		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
 		Number id = documentContext.read("$.id");
 
@@ -143,6 +141,7 @@ class BackendToDoAppApplicationTests {
 
 		HttpEntity<Task> request = new HttpEntity<>(updatedTask);
 		ResponseEntity<Void> response = restTemplate.exchange("/tasks/" + id, HttpMethod.PUT, request, Void.class);
+
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
@@ -160,7 +159,9 @@ class BackendToDoAppApplicationTests {
 
 		URI locationOfNewTask = createResponse.getHeaders().getLocation();
 		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
 		Number id = documentContext.read("$.id");
 
@@ -173,6 +174,7 @@ class BackendToDoAppApplicationTests {
 
 		HttpEntity<Task> request = new HttpEntity<>(uodatedTask);
 		ResponseEntity<Void> response = restTemplate.exchange("/tasks/-" + id, HttpMethod.PUT, request, Void.class);
+
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 	}
 
@@ -190,7 +192,9 @@ class BackendToDoAppApplicationTests {
 
 		URI locationOfNewTask = createResponse.getHeaders().getLocation();
 		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
 		Number id = documentContext.read("$.id");
 
@@ -198,7 +202,31 @@ class BackendToDoAppApplicationTests {
 
 		HttpEntity<Task> request = new HttpEntity<>(updatedTask);
 		ResponseEntity<Void> response = restTemplate.exchange("/tasks/" + id, HttpMethod.PUT, request, Void.class);
+
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	void shouldDeleteATask() {
+		Task newTask = new Task(
+				"Lorem ipsum dolor sit amet",
+				Task.Priority.HIGH,
+				false
+		);
+
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/tasks", newTask, Void.class);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI locationOfNewTask = createResponse.getHeaders().getLocation();
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewTask, String.class);
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+
+		ResponseEntity<Void> deleteResponse = restTemplate.exchange("/tasks/" + id, HttpMethod.DELETE, null, Void.class);
+		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 }
