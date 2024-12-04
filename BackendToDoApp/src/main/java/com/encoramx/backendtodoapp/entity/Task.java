@@ -1,4 +1,4 @@
-package com.encoramx.backendtodoapp.entities;
+package com.encoramx.backendtodoapp.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

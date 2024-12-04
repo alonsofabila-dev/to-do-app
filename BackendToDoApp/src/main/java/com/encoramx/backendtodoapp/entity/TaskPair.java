@@ -1,4 +1,4 @@
-package com.encoramx.backendtodoapp.entities;
+package com.encoramx.backendtodoapp.entity;
 
 public class TaskPair<L, R> {
 

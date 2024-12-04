@@ -1,7 +1,7 @@
 package com.encoramx.backendtodoapp;
 
 
-import com.encoramx.backendtodoapp.entities.Task;
+import com.encoramx.backendtodoapp.entity.Task;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

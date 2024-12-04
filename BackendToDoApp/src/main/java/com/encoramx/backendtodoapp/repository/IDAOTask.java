@@ -1,7 +1,7 @@
-package com.encoramx.backendtodoapp.persistance;
+package com.encoramx.backendtodoapp.repository;
 
 
-import com.encoramx.backendtodoapp.entities.Task;
+import com.encoramx.backendtodoapp.entity.Task;
 
 import java.util.LinkedList;
 
