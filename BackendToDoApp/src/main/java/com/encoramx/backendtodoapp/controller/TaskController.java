@@ -1,9 +1,12 @@
-package com.encoramx.backendtodoapp.controllers;
+package com.encoramx.backendtodoapp.controller;
 
 
-import com.encoramx.backendtodoapp.entities.Task;
-import com.encoramx.backendtodoapp.entities.TaskPair;
-import com.encoramx.backendtodoapp.services.TaskService;
+import com.encoramx.backendtodoapp.dto.AverageTimesDTO;
+import com.encoramx.backendtodoapp.dto.TaskResponseDTO;
+import com.encoramx.backendtodoapp.dto.UpdateTaskDTO;
+import com.encoramx.backendtodoapp.entity.Task;
+import com.encoramx.backendtodoapp.entity.TaskPair;
+import com.encoramx.backendtodoapp.service.TaskService;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -11,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class TaskController {
      * @return Response with status code 200 and a list of task with length of 10.
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>>  getAllTasks(
+    public ResponseEntity<TaskResponseDTO>  getAllTasks(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "dueDate", required = false) String dueDate,
@@ -44,19 +46,15 @@ public class TaskController {
             @RequestParam(value = "sortDueDateDirection", required = false) String sortDueDateDirection
     ) {
 
+        if (page < 0) {
+            logger.warn("Invalid page number");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         try {
-            if (page < 0) {
-                logger.warn("Invalid page number");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-
             TaskPair<LinkedList<Task>, Integer> result = taskService.getTasks(page, content, dueDate, priority, isCompleted, sortPriorityDirection, sortDueDateDirection);
-            LinkedList<Task> tasks = result.getLeft();
-            int totalSize = result.getRight();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("tasks", tasks);
-            response.put("totalSize", totalSize);
+            TaskResponseDTO response = new TaskResponseDTO(result.getLeft(), result.getRight());
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -69,14 +67,12 @@ public class TaskController {
     /**
      * @return Response with status code 200.
      */
-    @GetMapping("/averages")
-    public ResponseEntity<Map<String, Object>> getAverageTasks() {
+    @GetMapping("/average-times")
+    public ResponseEntity<AverageTimesDTO> getAverageTasks() {
         try {
-
-            Map<String, Object> response = new HashMap<>(taskService.calculateAverageCompletionTimes());
+            AverageTimesDTO response = taskService.calculateAverageCompletionTimes();
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
-
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -91,12 +87,13 @@ public class TaskController {
     @GetMapping("/{requestedId}")
     public ResponseEntity<Task> getTask(@PathVariable int requestedId) {
 
-        try {
-            if (requestedId <= 0) {
-                logger.warn("Invalid Id");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
 
+        if (requestedId <= 0) {
+            logger.warn("Invalid Id");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
             Task task = taskService.getTaskById(requestedId);
 
             if (task != null) {
@@ -121,12 +118,13 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<String> createTask(@RequestBody Task task) {
 
-        try {
-            if (task.getContent().isBlank() || task.getPriority() == null) {
-                logger.warn("Task has no content or task priority is null");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
-            }
 
+        if (task.getContent().isBlank() || task.getPriority() == null) {
+            logger.warn("Task has no content or task priority is null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request");
+        }
+
+        try {
             taskService.createTask(task);
 
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -146,24 +144,21 @@ public class TaskController {
      * @return Response with status code 200.
      */
     @PutMapping("/{requestedId}")
-    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody Map<String, Object> updatedTask) {
+    public ResponseEntity<String> updateTask(@PathVariable int requestedId, @RequestBody UpdateTaskDTO updatedTask) {
+
+
+        if (requestedId <= 0) {
+            logger.warn("Invalid Id");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        if (updatedTask.content() == null || updatedTask.priority() == null) {
+            logger.warn("Task is null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
         try {
-            if (requestedId <= 0) {
-                logger.warn("Invalid Id");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-
-            String content = (String) updatedTask.get("content");
-            String dueDate = (String) updatedTask.get("dueDate");
-            String priority = (String) updatedTask.get("priority");
-
-            if (content == null || priority == null) {
-                logger.warn("Task is null");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-
-            taskService.updateTask(requestedId, content, dueDate, priority);
+            taskService.updateTask(requestedId, updatedTask.content(), updatedTask.dueDate(), updatedTask.priority());
 
             return ResponseEntity.status(HttpStatus.OK).body("Task updated successfully");
         } catch (Exception e) {
@@ -181,12 +176,13 @@ public class TaskController {
      */
     @PatchMapping("/{requestedId}")
     public ResponseEntity<String> updateTaskCompletion(@PathVariable int requestedId, @RequestBody Map<String, Boolean> isCompleted) {
-        try {
-            if (requestedId <= 0) {
-                logger.warn("Invalid Id");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
 
+        if (requestedId <= 0) {
+            logger.warn("Invalid Id");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
             boolean completed = isCompleted.get("isCompleted");
             taskService.updateCompletedTask(requestedId, completed);
 
@@ -205,12 +201,13 @@ public class TaskController {
      */
     @DeleteMapping("/{requestedId}")
     public ResponseEntity<String> deleteTask(@PathVariable int requestedId) {
-        try {
-            if (requestedId <= 0) {
-                logger.warn("Invalid Id");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
 
+        if (requestedId <= 0) {
+            logger.warn("Invalid Id");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
             taskService.deleteTask(requestedId);
 
             return ResponseEntity.status(HttpStatus.OK).body("Task deleted successfully");
