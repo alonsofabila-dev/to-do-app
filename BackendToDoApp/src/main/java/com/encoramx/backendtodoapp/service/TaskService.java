@@ -50,10 +50,10 @@ public class TaskService {
 
         Map<Task.Priority, Double> averages = tasksList.stream()
                 .collect(Collectors.groupingBy(Task::getPriority,
-                        Collectors.averagingDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())));
+                        Collectors.averagingDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toSeconds())));
 
         totalAverage = tasksList.stream()
-                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toMinutes())
+                .mapToDouble(task -> Duration.between(task.getCreationDate(), task.getDoneDate()).toSeconds())
                 .average()
                 .orElse(0.0);
 
